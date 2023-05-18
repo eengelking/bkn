@@ -1,0 +1,9 @@
+- name: list
+  description: List the contents of the directory.
+  command: |-
+    ls -lah <variable>
+
+- name: listening
+  description: List all programs listening on a given port
+  command: |-
+    ss -tupln | grep LISTEN
