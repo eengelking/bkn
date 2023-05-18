@@ -33,7 +33,7 @@ Example:
     ss -tupln | grep LISTEN
 ```
 
-### The Purpose of <VARIALBE>
+### The Purpose of \<VARIALBE>
 You can pass variables with the `./bkn` command.
 
 For example, if I run the list command from the example above, I would run `./bkn list`. If I wanted to pass a variable to the command, I would run `./bkn list <variable>`. The variable is then replaced in the command with the value that you passed. For example, if I ran `./bkn list /tmp`, the command would be `ls -lah /tmp`.
