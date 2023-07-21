@@ -1,5 +1,7 @@
 # bkn
-Pronounced as Bacon. A better Make using Golang.
+![Bacon](images/bacon.png)
+
+Pronounced as Bacon. An attempt to create a simplified Make and Makefile for running commands.
 
 This is a simple program that allows you to run commands from a YAML file. This is useful for running commands that you run often but don't want to remember the syntax for, especially in pipelines.
 
@@ -43,3 +45,6 @@ You can pass variables with the `./bkn` command.
 For example, if I run the list command from the example above, I would run `./bkn list`. If I wanted to pass a variable to the command, I would run `./bkn list <variable>`. The variable is then replaced in the command with the value that you passed. For example, if I ran `./bkn list /tmp`, the command would be `ls -lah /tmp`.
 
 At the moment, you can only pass one variable to a command.
+
+# Attributes
+* <a href="https://www.flaticon.com/free-icons/bacon" title="bacon icons">Bacon icons created by Freepik - Flaticon</a>
