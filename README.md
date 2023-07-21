@@ -22,15 +22,19 @@ The YAML file is used to define the commands that you want to run. The file shou
 
 Example:
 ```yaml
-- name: list  # The name of the command
-  description: List the contents of the directory.  # The description of the command
-  command: |- # The command to run. The |- allows for multiline commands in a YAML file
-    ls -lah <variable>
+include:  # Optional. Include other YAML files to keep your commands organized.
+  - /path/to/other/file.yaml
 
-- name: listening
-  description: List all programs listening on a given port
-  command: |-
-    ss -tupln | grep LISTEN
+commands:
+  - name: list  # The name of the command
+    description: List the contents of the directory.  # The description of the command
+    command: |- # The command to run. The |- allows for multiline commands in a YAML file
+      ls -lah <variable>
+
+  - name: listening
+    description: List all programs listening on a given port
+    command: |-
+      ss -tupln | grep LISTEN
 ```
 
 ### The Purpose of \<VARIALBE>
