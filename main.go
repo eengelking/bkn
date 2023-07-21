@@ -1,6 +1,7 @@
 package main
 
 import (
+    "flag"
     "fmt"
     "os"
     "os/exec"
@@ -15,19 +16,35 @@ type Command struct {
     Command     string
 }
 
+type Include struct {
+	Commands []Command `yaml:"commands"`
+	Include  []string  `yaml:"include"`
+}
+
 func parseYaml(yamlFile string) ([]Command, error) {
-    data, err := os.ReadFile(yamlFile)
-    if err != nil {
-        return nil, err
-    }
+	data, err := os.ReadFile(yamlFile)
+	if err != nil {
+		return nil, err
+	}
 
-    var commands []Command
-    err = yaml.Unmarshal(data, &commands)
-    if err != nil {
-        return nil, err
-    }
+	var includes Include
+	err = yaml.Unmarshal(data, &includes)
+	if err != nil {
+		return nil, err
+	}
 
-    return commands, nil
+	commands := includes.Commands
+
+	for _, includeFile := range includes.Include {
+		includeCommands, err := parseYaml(includeFile) // Treat included files the same as the main file
+		if err != nil {
+			return nil, err
+		}
+
+		commands = append(commands, includeCommands...)
+	}
+
+	return commands, nil
 }
 
 func listCommands(commands []Command) {

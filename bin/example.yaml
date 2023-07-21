@@ -1,13 +1,10 @@
-include:
-  - example.yaml
-
 commands:
-  - name: list
+  - name: pwd
     description: List the contents of the directory.
     command: |-
-      ls -lah <variable>
+      pwd
 
-  - name: listening
+  - name: echo
     description: List all programs listening on a given port
     command: |-
-      ss -tupln | grep LISTEN
+      echo "Hello World!"
