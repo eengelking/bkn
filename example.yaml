@@ -1,10 +1,61 @@
 commands:
-  - name: pwd
-    description: List the contents of the directory.
+  - name: hello
+    description: Print a friendly greeting.
     command: |-
-      pwd
+      echo "Hello from bkn!"
 
-  - name: echo
-    description: List all programs listening on a given port
+  - name: greet
+    description: Greet someone by name (defaults to "world"). Usage bkn greet [name]
     command: |-
-      echo "Hello World!"
+      echo "Hello, ${1:-world}!"
+
+  - name: list
+    description: List directory contents, forwarding any extra args to ls.
+    command: |-
+      ls -lah "$@"
+
+  - name: find-text
+    description: Recursively grep for a pattern. Usage bkn find-text <pattern> [path]
+    command: |-
+      if [ $# -lt 1 ]; then
+        echo "usage: bkn find-text <pattern> [path]" >&2
+        exit 1
+      fi
+      grep -rn "$1" "${2:-.}"
+
+  - name: git-sync
+    description: Fetch, rebase against upstream, and show working tree status.
+    command: |-
+      git fetch --all --prune && \
+      git pull --rebase && \
+      git status
+
+  - name: ports
+    description: List listening ports, or check a specific one. Usage bkn ports [port]
+    command: |-
+      if [ $# -eq 0 ]; then
+        ss -tupln | grep LISTEN
+      else
+        MATCH="$(ss -tupln | grep LISTEN | grep ":$1 ")"
+        if [ -n "$MATCH" ]; then
+          echo "$MATCH"
+        else
+          echo "No open port $1 found."
+        fi
+      fi
+
+  - name: docker-clean
+    description: Prune stopped containers, dangling images, and unused volumes.
+    command: |-
+      docker container prune -f
+      docker image prune -f
+      docker volume prune -f
+
+  - name: backup
+    description: Tar+gzip a directory into a timestamped archive. Usage bkn backup <src> <dest-dir>
+    command: |-
+      SRC="${1:?source directory required}"
+      DEST="${2:?destination directory required}"
+      STAMP="$(date +%Y%m%d-%H%M%S)"
+      tar -czf "${DEST%/}/backup-${STAMP}.tar.gz" "$SRC"
+      echo "Wrote ${DEST%/}/backup-${STAMP}.tar.gz"

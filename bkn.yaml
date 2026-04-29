@@ -5,7 +5,7 @@ commands:
   - name: list
     description: List the contents of the directory.
     command: |-
-      ls -lah <variable>
+      ls -lah "$@"
 
   - name: listening
     description: List all programs listening on a given port

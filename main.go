@@ -69,10 +69,10 @@ func listCommands(commands []Command) {
 	}
 }
 
-func executeCommand(command Command, variable string) {
-    cmdStr := strings.Replace(command.Command, "<variable>", variable, -1)
+func executeCommand(command Command, args []string) {
+    shArgs := append([]string{"-c", command.Command, "bkn"}, args...)
 
-    cmd := exec.Command("sh", "-c", cmdStr)
+    cmd := exec.Command("sh", shArgs...)
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
     err := cmd.Run()
@@ -94,15 +94,11 @@ func main() {
     }
 
     option := os.Args[1]
-    variable := ""
-
-    if len(os.Args) > 2 {
-        variable = os.Args[2]
-    }
+    args := os.Args[2:]
 
     for _, cmd := range commands {
         if cmd.Name == option {
-            executeCommand(cmd, variable)
+            executeCommand(cmd, args)
             return
         }
     }
