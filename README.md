@@ -13,11 +13,38 @@ This is a simple program that allows you to run commands from a YAML file. This 
 2. Run `./bkn` from this directory or copy the `bkn` binary and the `bkn.yaml` to another directory.
 3. Update the bkn.yaml file with your commands.
 
+By default `bkn` reads `bkn.yaml` from the current working directory. Use `-c` / `--config` (see [Flags](#flags)) to point it at a YAML file in another location instead of copying one next to the binary.
+
+## Flags
+
+| Flag | Description |
+| --- | --- |
+| `-c`, `--config <path>` | Path to the YAML file to load. Defaults to `bkn.yaml` in the current working directory. |
+| `-h`, `--help` | Print colored usage info and the list of available commands, then exit. |
+
+Both short and long forms accept the standard Go-flag spellings: `-c path`, `-c=path`, `--config path`, and `--config=path` all work.
+
+Examples:
+
+```sh
+# Run the `hello` command from a YAML file in another directory
+bkn -c /etc/bkn/team.yaml hello
+
+# Forward args to the underlying shell command (positional args after the command name)
+bkn --config ~/dotfiles/bkn.yaml greet Ed
+
+# Show help with the command list
+bkn --help
+```
+
+Note: because flag parsing uses Go's standard `flag` package, `-c` / `-h` are consumed wherever they appear on the command line. If you need to forward a literal `-c` or `-h` to your shell command, quote it or rename the conflicting argument.
+
 ## Building from Source
 1. Install Golang
 2. Clone the repo
 3. CD to the repo directory
-4. Run `go build -o bin/bkn main.go`
+4. Run `go build -o bin/bkn ./cmd/bkn`
+5. Run `go test ./...` to execute the test suite
 
 ## YAML File
 The YAML file is used to define the commands that you want to run. The file should be named `bkn.yaml` and should be in the same directory as the `bkn` binary.
