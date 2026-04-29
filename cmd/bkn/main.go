@@ -27,15 +27,16 @@ func main() {
 	flag.Parse()
 
 	commands, err := config.ParseYAML(configPath)
-	if err != nil {
-		fmt.Printf("Failed to parse YAML file: %s\n", err)
-		os.Exit(1)
-	}
 
 	args := flag.Args()
 	if showHelp || len(args) == 0 {
 		ui.PrintUsage(os.Stdout, commands)
 		return
+	}
+
+	if err != nil {
+		fmt.Printf("Failed to parse YAML file: %s\n", err)
+		os.Exit(1)
 	}
 
 	option := args[0]
