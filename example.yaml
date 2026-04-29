@@ -30,8 +30,21 @@ commands:
       git pull --rebase && \
       git status
 
+  - name: win-list
+    description: List directory contents on Windows. Usage bkn win-list [path]
+    os: [windows]
+    command: |-
+      dir %1
+
+  - name: brew-update
+    description: Update Homebrew and upgrade installed formulae (macOS only).
+    os: [darwin]
+    command: |-
+      brew update && brew upgrade
+
   - name: ports
     description: List listening ports, or check a specific one. Usage bkn ports [port]
+    os: [linux, darwin]
     command: |-
       if [ $# -eq 0 ]; then
         ss -tupln | grep LISTEN

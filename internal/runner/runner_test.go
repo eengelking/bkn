@@ -53,3 +53,28 @@ func TestExecute_ShellFailureDoesNotPanicOrExit(t *testing.T) {
 		t.Errorf("expected failure message on stdout, got %q", out.String())
 	}
 }
+
+func skipIfNotWindows(t *testing.T) {
+	t.Helper()
+	if runtime.GOOS != "windows" {
+		t.Skip("windows-only test")
+	}
+}
+
+func TestExecute_WindowsPositionalArgs(t *testing.T) {
+	skipIfNotWindows(t)
+	var out, errBuf bytes.Buffer
+	Execute(&out, &errBuf, config.Command{Command: `echo %1-%2`}, []string{"a", "b"})
+	if got := strings.TrimSpace(out.String()); got != "a-b" {
+		t.Errorf("stdout = %q, want %q", got, "a-b")
+	}
+}
+
+func TestExecute_WindowsStarExpansion(t *testing.T) {
+	skipIfNotWindows(t)
+	var out, errBuf bytes.Buffer
+	Execute(&out, &errBuf, config.Command{Command: `echo %*`}, []string{"x", "y", "z"})
+	if got := strings.TrimSpace(out.String()); got != "x y z" {
+		t.Errorf("stdout = %q, want %q", got, "x y z")
+	}
+}

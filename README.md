@@ -77,5 +77,44 @@ For example, given the `list` command above:
 
 You can also pull individual positions, e.g. `command: echo "first=$1 second=$2"`.
 
+### Shell and syntax by OS
+`bkn` invokes a different shell per host so positional-argument forwarding feels native on each platform:
+
+| OS | Shell | Positional syntax |
+| --- | --- | --- |
+| Linux, macOS | `sh -c <body> bkn <args...>` | `$1`, `$2`, `$@`, `$#` |
+| Windows | `cmd.exe /C <tempfile>.bat <args...>` (the body is written to a temp `.bat` so that `%1` substitution actually fires — `cmd /C` does not perform it on inline strings) | `%1`, `%2`, `%*` |
+
+Command bodies are therefore **not portable** across OSes. Pair OS-specific bodies with the `os:` field so each host only sees the bodies it can run:
+
+```yaml
+commands:
+  - name: list
+    description: List a directory (linux/macOS).
+    os: [linux, darwin]
+    command: ls -lah "$@"
+
+  - name: win-list
+    description: List a directory (Windows).
+    os: [windows]
+    command: dir %1
+```
+
+### Restricting Commands by OS
+Each command may declare an optional `os:` list to restrict it to specific host operating systems. Values match Go's `runtime.GOOS` (`linux`, `darwin`, `windows`, …). When `os:` is omitted, the command is available everywhere. When set, the command is only listed and only runnable on a matching host; on any other host it is hidden, and invoking it falls through to the standard `Invalid option` message.
+
+```yaml
+commands:
+  - name: brew-update
+    description: Update Homebrew (macOS only).
+    os: [darwin]
+    command: brew update && brew upgrade
+
+  - name: ports
+    description: List listening ports.
+    os: [linux, darwin]
+    command: ss -tupln | grep LISTEN
+```
+
 # Attributes
 * <a href="https://www.flaticon.com/free-icons/bacon" title="bacon icons">Bacon icons created by Freepik - Flaticon</a>

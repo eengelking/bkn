@@ -21,12 +21,13 @@ func main() {
 
 	flag.Usage = func() {
 		commands, _ := config.ParseYAML(configPath)
-		ui.PrintUsage(os.Stdout, commands)
+		ui.PrintUsage(os.Stdout, config.FilterForHost(commands))
 	}
 
 	flag.Parse()
 
 	commands, err := config.ParseYAML(configPath)
+	commands = config.FilterForHost(commands)
 
 	args := flag.Args()
 	if showHelp || len(args) == 0 {

@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -95,6 +96,73 @@ include:
 `)
 	if _, err := ParseYAML(parent); err == nil {
 		t.Fatal("expected error from missing include, got nil")
+	}
+}
+
+func TestParseYAML_OSField(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "bkn.yaml")
+	writeFile(t, path, `
+commands:
+  - name: cross
+    description: dual-target
+    command: echo cross
+    os: [linux, darwin]
+  - name: anywhere
+    description: no restriction
+    command: echo anywhere
+`)
+	cmds, err := ParseYAML(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := cmds[0].OS; len(got) != 2 || got[0] != "linux" || got[1] != "darwin" {
+		t.Errorf("cmds[0].OS = %v, want [linux darwin]", got)
+	}
+	if len(cmds[1].OS) != 0 {
+		t.Errorf("cmds[1].OS = %v, want empty", cmds[1].OS)
+	}
+}
+
+func TestCommand_AllowedOnHost(t *testing.T) {
+	host := runtime.GOOS
+	cases := []struct {
+		name string
+		os   []string
+		want bool
+	}{
+		{"omitted", nil, true},
+		{"empty", []string{}, true},
+		{"matches host", []string{host}, true},
+		{"only foreign", []string{"plan9"}, false},
+		{"includes host", []string{"plan9", host}, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := Command{OS: tc.os}
+			if got := c.AllowedOnHost(); got != tc.want {
+				t.Errorf("AllowedOnHost() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFilterForHost(t *testing.T) {
+	host := runtime.GOOS
+	in := []Command{
+		{Name: "a"},
+		{Name: "b", OS: []string{host}},
+		{Name: "c", OS: []string{"plan9"}},
+		{Name: "d", OS: []string{"plan9", host}},
+	}
+	out := FilterForHost(in)
+	if len(out) != 3 {
+		t.Fatalf("want 3 commands, got %d (%+v)", len(out), out)
+	}
+	for _, c := range out {
+		if c.Name == "c" {
+			t.Errorf("filtered slice should not contain plan9-only command")
+		}
 	}
 }
 
