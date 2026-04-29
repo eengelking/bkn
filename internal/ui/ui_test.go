@@ -55,6 +55,28 @@ func TestListCommands_PaddingAlignsColumns(t *testing.T) {
 	}
 }
 
+func TestListCommands_EmptyOmitsHeader(t *testing.T) {
+	var buf bytes.Buffer
+	ListCommands(&buf, nil)
+	if buf.Len() != 0 {
+		t.Errorf("expected no output for empty commands, got: %q", buf.String())
+	}
+}
+
+func TestPrintUsage_EmptyCommandsStillPrintsFlags(t *testing.T) {
+	var buf bytes.Buffer
+	PrintUsage(&buf, nil)
+	out := buf.String()
+	for _, want := range []string{"Usage:", "-h, --help", "BKN"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("usage output missing %q", want)
+		}
+	}
+	if strings.Contains(out, "Available commands") {
+		t.Errorf("did not expect 'Available commands' header with no commands; got:\n%s", out)
+	}
+}
+
 func TestPrintUsage_IncludesFlagsAndCommands(t *testing.T) {
 	var buf bytes.Buffer
 	PrintUsage(&buf, sampleCommands())

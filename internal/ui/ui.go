@@ -15,6 +15,10 @@ const (
 )
 
 func ListCommands(w io.Writer, commands []config.Command) {
+	if len(commands) == 0 {
+		return
+	}
+
 	fmt.Fprintf(w, "%s-----\nAvailable commands:\n-----%s\n\n", Teal, Reset)
 
 	longestName := 0
